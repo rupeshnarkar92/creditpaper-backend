@@ -1,0 +1,10 @@
+Transcribe the text on this page image as plain text.
+
+Rules:
+- Verbatim: copy every character exactly as printed, including numbers, currency symbols, commas, decimal points, percent signs, dates and punctuation. Never correct, normalise, round, reformat, summarise or translate anything.
+- Reading order: top to bottom, left to right; finish one column before starting the next.
+- One output line per visual line on the page.
+- Tables: one output line per table row, with the cells in order, separated by two or more spaces. Keep the header row(s). Leave an empty cell empty; do not fill it.
+- Text you cannot read: write [illegible] in its place. Never guess a character or a digit.
+- Output only the transcription: no commentary, no headings of your own, no Markdown, no code fences.
+- If the page has no text at all, output nothing.

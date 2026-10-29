@@ -1,0 +1,1536 @@
+{
+  "version": 1,
+  "notes": [
+    "One entry per Fact in model/deal.py (FIELD_REFERENCE.generated.md); tests/deals/test_fact_sheet.py fails if a Fact is not covered.",
+    "Paths use the citation grammar with [*] for any key of a keyed collection; a fixed key (values_by_basis[as_is]) is listed before the [*] pattern, which then covers the remaining keys.",
+    "kind subtree: every present fact under the path, labelled from its path (additional valuations and firm comparables keep the valuation shape).",
+    "core: the judgement that a field is part of what its block must carry (true, or the deal types it is core for). A field is REQUIRED for a deal only when it is core for that deal type AND its block is fed by a non-optional slot for that type (docs/specs/slot-taxonomy model_block). required and expected_from are derived at read time from the taxonomy, never stored here.",
+    "collection_label: the plural label of a required keyed collection shown once as missing when it has no entries.",
+    "type_scoped_blocks: blocks a slot feeds only for some deal types even though the slot applies to all (the title search carries registered OC titles only on residual stock)."
+  ],
+  "type_scoped_blocks": {
+    "oc_titles": [
+      "residual_stock"
+    ]
+  },
+  "groups": [
+    {
+      "key": "deal",
+      "title": "Deal",
+      "applies_to": [
+        "all"
+      ],
+      "fields": [
+        {
+          "path": "deal.name",
+          "label": "Deal Name",
+          "kind": "text"
+        },
+        {
+          "path": "deal.type",
+          "label": "Facility Type",
+          "kind": "text",
+          "enum": true
+        },
+        {
+          "path": "deal.delivery_model",
+          "label": "Delivery Model",
+          "kind": "text",
+          "enum": true
+        },
+        {
+          "path": "deal.expected_funding_date",
+          "label": "Expected Funding Date",
+          "kind": "date"
+        },
+        {
+          "path": "deal.exit_strategy",
+          "label": "Exit Strategy",
+          "kind": "text"
+        },
+        {
+          "path": "rfi.items[*].description",
+          "label": "RFI Item: {key}",
+          "kind": "text"
+        },
+        {
+          "path": "rfi.items[*].status",
+          "label": "RFI Item Status: {key}",
+          "kind": "text",
+          "core": true,
+          "collection_label": "Items"
+        }
+      ]
+    },
+    {
+      "key": "facility",
+      "title": "Facility and Pricing",
+      "applies_to": [
+        "all"
+      ],
+      "fields": [
+        {
+          "path": "economics.facility_amount",
+          "label": "Facility Amount",
+          "kind": "money",
+          "core": true
+        },
+        {
+          "path": "economics.interest_rate",
+          "label": "Interest Rate",
+          "kind": "percent",
+          "core": true
+        },
+        {
+          "path": "economics.term_months",
+          "label": "Term",
+          "kind": "months",
+          "core": true
+        },
+        {
+          "path": "economics.limit_includes_capitalised_interest",
+          "label": "Limit Includes Capitalised Interest",
+          "kind": "boolean"
+        },
+        {
+          "path": "economics.fees[*].pct",
+          "label": "{key} Fee Rate",
+          "kind": "percent"
+        },
+        {
+          "path": "economics.fees[*].amount",
+          "label": "{key} Fee",
+          "kind": "money",
+          "core": true,
+          "collection_label": "Fees"
+        },
+        {
+          "path": "economics.funding_table[*].total",
+          "label": "{key}: Total",
+          "kind": "money"
+        },
+        {
+          "path": "economics.funding_table[*].senior",
+          "label": "{key}: Senior Debt",
+          "kind": "money"
+        },
+        {
+          "path": "economics.funding_table[*].equity",
+          "label": "{key}: Equity",
+          "kind": "money"
+        },
+        {
+          "path": "economics.total_cost",
+          "label": "Total Project Cost",
+          "kind": "money"
+        },
+        {
+          "path": "economics.senior_total",
+          "label": "Total Senior Debt",
+          "kind": "money"
+        },
+        {
+          "path": "economics.equity_total",
+          "label": "Total Equity",
+          "kind": "money"
+        },
+        {
+          "path": "funding_table.facility_amount",
+          "label": "Borrower Funding Table: Facility Amount",
+          "kind": "money",
+          "core": true
+        },
+        {
+          "path": "funding_table.lines[*].total",
+          "label": "Borrower Funding Table {key}: Total",
+          "kind": "money"
+        },
+        {
+          "path": "funding_table.lines[*].senior",
+          "label": "Borrower Funding Table {key}: Senior Debt",
+          "kind": "money"
+        },
+        {
+          "path": "funding_table.lines[*].equity",
+          "label": "Borrower Funding Table {key}: Equity",
+          "kind": "money"
+        },
+        {
+          "path": "economics.contingency",
+          "label": "Contingency",
+          "kind": "money"
+        }
+      ]
+    },
+    {
+      "key": "its",
+      "title": "Term Sheet Conditions",
+      "applies_to": [
+        "all"
+      ],
+      "fields": [
+        {
+          "path": "its.borrower_entity",
+          "label": "Borrower Entity",
+          "kind": "text",
+          "core": true
+        },
+        {
+          "path": "its.guarantors[*]",
+          "label": "Guarantor: {key}",
+          "kind": "text",
+          "core": true,
+          "collection_label": "Guarantors"
+        },
+        {
+          "path": "its.cp_list[*]",
+          "label": "Condition Precedent: {key}",
+          "kind": "text"
+        },
+        {
+          "path": "its.signed",
+          "label": "Term Sheet Signed",
+          "kind": "boolean",
+          "core": true
+        },
+        {
+          "path": "its.signed_date",
+          "label": "Term Sheet Signed Date",
+          "kind": "date",
+          "core": true
+        },
+        {
+          "path": "covenants[*].name",
+          "label": "Covenant: {key}",
+          "kind": "text",
+          "core": true,
+          "collection_label": "Covenants"
+        },
+        {
+          "path": "covenants[*].summary",
+          "label": "Covenant Summary: {key}",
+          "kind": "text"
+        },
+        {
+          "path": "covenants[*].threshold",
+          "label": "Covenant Threshold: {key}",
+          "kind": "text"
+        },
+        {
+          "path": "covenants[*].threshold_value",
+          "label": "Covenant Threshold Value: {key}",
+          "kind": "number"
+        },
+        {
+          "path": "covenants[*].basis",
+          "label": "Covenant Basis: {key}",
+          "kind": "text"
+        }
+      ]
+    },
+    {
+      "key": "metrics",
+      "title": "Metrics",
+      "applies_to": [
+        "all"
+      ],
+      "fields": [
+        {
+          "path": "metrics.lvr_basis",
+          "label": "LVR Basis",
+          "kind": "text"
+        },
+        {
+          "path": "metrics.lvr_pct",
+          "label": "LVR",
+          "kind": "percent"
+        },
+        {
+          "path": "metrics.lvr_ceiling_value",
+          "label": "LVR Ceiling Value",
+          "kind": "money"
+        },
+        {
+          "path": "metrics.lvr_headroom_amount",
+          "label": "LVR Headroom",
+          "kind": "money"
+        },
+        {
+          "path": "metrics.lvr_breach_value",
+          "label": "Value at LVR Breach",
+          "kind": "money"
+        },
+        {
+          "path": "metrics.lvr_breach_drop_pct",
+          "label": "Value Fall to LVR Breach",
+          "kind": "percent"
+        },
+        {
+          "path": "metrics.lcr_pct",
+          "label": "LCR",
+          "kind": "percent"
+        },
+        {
+          "path": "metrics.lcr_ceiling_amount",
+          "label": "LCR Ceiling Amount",
+          "kind": "money"
+        },
+        {
+          "path": "metrics.lcr_headroom_amount",
+          "label": "LCR Headroom",
+          "kind": "money"
+        },
+        {
+          "path": "metrics.asis_lvr_pct",
+          "label": "Day One LVR (As Is)",
+          "kind": "percent"
+        },
+        {
+          "path": "metrics.asis_security_gap",
+          "label": "Day One Security Gap",
+          "kind": "money"
+        }
+      ]
+    },
+    {
+      "key": "security",
+      "title": "Security",
+      "applies_to": [
+        "all"
+      ],
+      "fields": [
+        {
+          "path": "security.title_status",
+          "label": "Title Status",
+          "kind": "text",
+          "core": true
+        },
+        {
+          "path": "security.encumbrances[*]",
+          "label": "Encumbrance: {key}",
+          "kind": "text"
+        },
+        {
+          "path": "security.ppsr_findings[*]",
+          "label": "PPSR Finding: {key}",
+          "kind": "text"
+        },
+        {
+          "path": "security.first_mortgage_available",
+          "label": "First Mortgage Available",
+          "kind": "boolean",
+          "core": true
+        },
+        {
+          "path": "security.lien_position",
+          "label": "Mortgage Ranking",
+          "kind": "number"
+        }
+      ]
+    },
+    {
+      "key": "capital_stack",
+      "title": "Capital Stack",
+      "applies_to": [
+        "all"
+      ],
+      "fields": [
+        {
+          "path": "capital_stack.subordinated[*].lender",
+          "label": "Subordinated {key}: Lender",
+          "kind": "text"
+        },
+        {
+          "path": "capital_stack.subordinated[*].amount",
+          "label": "Subordinated {key}: Amount",
+          "kind": "money"
+        },
+        {
+          "path": "capital_stack.subordinated[*].priority_amount",
+          "label": "Subordinated {key}: Priority Amount",
+          "kind": "money"
+        },
+        {
+          "path": "capital_stack.subordinated[*].standstill",
+          "label": "Subordinated {key}: Standstill",
+          "kind": "text"
+        },
+        {
+          "path": "capital_stack.subordinated[*].maturity",
+          "label": "Subordinated {key}: Maturity",
+          "kind": "date"
+        }
+      ]
+    },
+    {
+      "key": "valuation",
+      "title": "Valuation",
+      "applies_to": [
+        "all"
+      ],
+      "fields": [
+        {
+          "path": "valuation.valuer",
+          "label": "Valuer",
+          "kind": "text",
+          "core": true
+        },
+        {
+          "path": "valuation.valuation_date",
+          "label": "Valuation Date",
+          "kind": "date",
+          "core": true
+        },
+        {
+          "path": "valuation.report_date",
+          "label": "Report Date",
+          "kind": "date"
+        },
+        {
+          "path": "valuation.relying_party",
+          "label": "Relying Party",
+          "kind": "text",
+          "core": true
+        },
+        {
+          "path": "valuation.gst_basis",
+          "label": "GST Basis",
+          "kind": "text"
+        },
+        {
+          "path": "valuation.methodology.adopted_rate",
+          "label": "Adopted Rate ($/sqm)",
+          "kind": "money"
+        },
+        {
+          "path": "valuation.unit_schedule[*].unit_mix",
+          "label": "Unit {key}: Mix",
+          "kind": "text"
+        },
+        {
+          "path": "valuation.unit_schedule[*].area",
+          "label": "Unit {key}: Area (sqm)",
+          "kind": "number"
+        },
+        {
+          "path": "valuation.unit_schedule[*].outdoor_area",
+          "label": "Unit {key}: Outdoor Area (sqm)",
+          "kind": "number"
+        },
+        {
+          "path": "valuation.unit_schedule[*].value",
+          "label": "Unit {key}: Assessed Value",
+          "kind": "money"
+        },
+        {
+          "path": "valuation.unit_schedule[*].rate",
+          "label": "Unit {key}: Rate ($/sqm)",
+          "kind": "money"
+        },
+        {
+          "path": "valuation.expected_funding_date_check",
+          "label": "Current at Expected Funding Date",
+          "kind": "boolean"
+        },
+        {
+          "path": "valuation.values_by_basis[as_is]",
+          "label": "As Is Value",
+          "kind": "money",
+          "core": true
+        },
+        {
+          "path": "valuation.values_by_basis[as_if_complete]",
+          "label": "As If Complete Value",
+          "kind": "money",
+          "core": [
+            "construction"
+          ]
+        },
+        {
+          "path": "valuation.values_by_basis[*]",
+          "label": "{key} Value",
+          "kind": "money"
+        },
+        {
+          "path": "valuation.methodology.approach",
+          "label": "Valuation Approach",
+          "kind": "text"
+        },
+        {
+          "path": "valuation.methodology.figures[*]",
+          "label": "Valuation Input: {key}",
+          "kind": "number"
+        },
+        {
+          "path": "valuation.comp_set[*].land_area",
+          "label": "Comparable {key}: Land Area",
+          "kind": "number"
+        },
+        {
+          "path": "valuation.comp_set[*].gfa_nla",
+          "label": "Comparable {key}: GFA or NLA",
+          "kind": "number"
+        },
+        {
+          "path": "valuation.comp_set[*].unit_mix",
+          "label": "Comparable {key}: Unit Mix",
+          "kind": "text"
+        },
+        {
+          "path": "valuation.comp_set[*].location",
+          "label": "Comparable {key}: Location",
+          "kind": "text"
+        },
+        {
+          "path": "valuation.comp_set[*].distance_from_subject",
+          "label": "Comparable {key}: Distance from Subject",
+          "kind": "text"
+        },
+        {
+          "path": "valuation.comp_set[*].sale_date",
+          "label": "Comparable {key}: Sale Date",
+          "kind": "date"
+        },
+        {
+          "path": "valuation.comp_set[*].sale_price",
+          "label": "Comparable {key}: Sale Price",
+          "kind": "money"
+        },
+        {
+          "path": "valuation.comp_set[*].derived_rate",
+          "label": "Comparable {key}: Rate per sqm",
+          "kind": "money"
+        },
+        {
+          "path": "valuation.comp_set[*].condition",
+          "label": "Comparable {key}: Condition",
+          "kind": "text"
+        },
+        {
+          "path": "valuation.comp_set[*].zoning",
+          "label": "Comparable {key}: Zoning",
+          "kind": "text"
+        },
+        {
+          "path": "valuation.comp_set[*].adjustment",
+          "label": "Comparable {key}: Adjustment",
+          "kind": "text"
+        },
+        {
+          "path": "valuation.comp_set[*].adjustment_reason",
+          "label": "Comparable {key}: Adjustment Reason",
+          "kind": "text"
+        },
+        {
+          "path": "valuation.subject_attributes.land_area",
+          "label": "Subject Land Area",
+          "kind": "number"
+        },
+        {
+          "path": "valuation.subject_attributes.gfa_nla",
+          "label": "Subject GFA or NLA",
+          "kind": "number"
+        },
+        {
+          "path": "valuation.subject_attributes.unit_mix",
+          "label": "Subject Unit Mix",
+          "kind": "text"
+        },
+        {
+          "path": "valuation.subject_attributes.location",
+          "label": "Subject Location",
+          "kind": "text"
+        },
+        {
+          "path": "valuation.subject_attributes.distance_from_subject",
+          "label": "Subject Distance",
+          "kind": "text"
+        },
+        {
+          "path": "valuation.subject_attributes.sale_date",
+          "label": "Subject Sale Date",
+          "kind": "date"
+        },
+        {
+          "path": "valuation.subject_attributes.sale_price",
+          "label": "Subject Sale Price",
+          "kind": "money"
+        },
+        {
+          "path": "valuation.subject_attributes.derived_rate",
+          "label": "Subject Rate per sqm",
+          "kind": "money"
+        },
+        {
+          "path": "valuation.subject_attributes.condition",
+          "label": "Subject Condition",
+          "kind": "text"
+        },
+        {
+          "path": "valuation.subject_attributes.zoning",
+          "label": "Subject Zoning",
+          "kind": "text"
+        },
+        {
+          "path": "valuation.subject_attributes.adjustment",
+          "label": "Subject Adjustment",
+          "kind": "text"
+        },
+        {
+          "path": "valuation.subject_attributes.adjustment_reason",
+          "label": "Subject Adjustment Reason",
+          "kind": "text"
+        },
+        {
+          "path": "valuation.comp_summary_table",
+          "label": "Comparables Summary Table",
+          "kind": "text"
+        },
+        {
+          "path": "valuation.property.address",
+          "label": "Property Address",
+          "kind": "text",
+          "core": true
+        },
+        {
+          "path": "valuation.property.title_reference",
+          "label": "Property Title Reference",
+          "kind": "text",
+          "core": true
+        },
+        {
+          "path": "valuation.property.zoning",
+          "label": "Zoning",
+          "kind": "text"
+        },
+        {
+          "path": "valuation.property.planning_controls",
+          "label": "Planning Controls",
+          "kind": "text"
+        },
+        {
+          "path": "valuation.property.site_area",
+          "label": "Site Area",
+          "kind": "number"
+        },
+        {
+          "path": "valuation.property.gfa_total",
+          "label": "Total GFA",
+          "kind": "number"
+        },
+        {
+          "path": "valuation.property_risks[*]",
+          "label": "Property Risk: {key}",
+          "kind": "text"
+        },
+        {
+          "path": "valuation.market.conditions",
+          "label": "Market Conditions",
+          "kind": "text"
+        },
+        {
+          "path": "valuation.market.supply_demand",
+          "label": "Market Supply and Demand",
+          "kind": "text"
+        },
+        {
+          "path": "valuation.market.macro_factors[*]",
+          "label": "Macro Factor: {key}",
+          "kind": "text"
+        },
+        {
+          "path": "valuation.market.locality_outlook",
+          "label": "Market Locality Outlook",
+          "kind": "text"
+        },
+        {
+          "path": "valuation.market.market_risks[*]",
+          "label": "Market Risk: {key}",
+          "kind": "text"
+        },
+        {
+          "path": "check_valuations[*]",
+          "label": "Check Valuation {key}",
+          "kind": "subtree"
+        },
+        {
+          "path": "firm_comps[*]",
+          "label": "Firm Comparable {key}",
+          "kind": "subtree"
+        }
+      ]
+    },
+    {
+      "key": "borrower",
+      "title": "Borrower and Sponsor",
+      "applies_to": [
+        "all"
+      ],
+      "fields": [
+        {
+          "path": "sponsor.financials[*].revenue_trend",
+          "label": "Financial Year {key}: Revenue Trend",
+          "kind": "text"
+        },
+        {
+          "path": "sponsor.financials[*].profitability",
+          "label": "Financial Year {key}: Profit",
+          "kind": "money",
+          "core": true,
+          "collection_label": "Borrower Financial Years"
+        },
+        {
+          "path": "sponsor.financials[*].debt_levels",
+          "label": "Financial Year {key}: Debt Levels",
+          "kind": "money"
+        },
+        {
+          "path": "sponsor.financials[*].going_concern",
+          "label": "Financial Year {key}: Going Concern",
+          "kind": "boolean",
+          "core": true,
+          "collection_label": "Borrower Financial Years"
+        },
+        {
+          "path": "sponsor.financials[*].contingent_liabilities[*]",
+          "label": "Financial Year {key}: Contingent Liability",
+          "kind": "text"
+        },
+        {
+          "path": "sponsor.financials[*].related_party_transactions[*]",
+          "label": "Financial Year {key}: Related Party Transaction",
+          "kind": "text"
+        },
+        {
+          "path": "sponsor.structure.entities[*].name",
+          "label": "Entity {key}: Name",
+          "kind": "text",
+          "core": true,
+          "collection_label": "Borrower Entities"
+        },
+        {
+          "path": "sponsor.structure.entities[*].entity_type",
+          "label": "Entity {key}: Type",
+          "kind": "text"
+        },
+        {
+          "path": "sponsor.structure.entities[*].role",
+          "label": "Entity {key}: Role",
+          "kind": "text"
+        },
+        {
+          "path": "sponsor.structure.ubos[*]",
+          "label": "Ultimate Beneficial Owner: {key}",
+          "kind": "text"
+        },
+        {
+          "path": "sponsor.structure.trusts[*].name",
+          "label": "Trust {key}: Name",
+          "kind": "text"
+        },
+        {
+          "path": "sponsor.structure.trusts[*].entity_type",
+          "label": "Trust {key}: Type",
+          "kind": "text"
+        },
+        {
+          "path": "sponsor.structure.trusts[*].role",
+          "label": "Trust {key}: Role",
+          "kind": "text"
+        },
+        {
+          "path": "sponsor.structure.related_party_flags[*]",
+          "label": "Related Party Flag: {key}",
+          "kind": "text"
+        },
+        {
+          "path": "sponsor.claims[*].claim",
+          "label": "Track Record Claim {key}",
+          "kind": "text",
+          "core": true,
+          "collection_label": "Track Record Claims"
+        },
+        {
+          "path": "sponsor.claims[*].project",
+          "label": "Track Record Claim {key}: Project",
+          "kind": "text"
+        },
+        {
+          "path": "sponsor.claims[*].asset_type",
+          "label": "Track Record Claim {key}: Asset Type",
+          "kind": "text"
+        },
+        {
+          "path": "sponsor.claims[*].scale",
+          "label": "Track Record Claim {key}: Scale",
+          "kind": "text"
+        },
+        {
+          "path": "sponsor.claims[*].year",
+          "label": "Track Record Claim {key}: Year",
+          "kind": "number"
+        },
+        {
+          "path": "sponsor.claims[*].verifiable_detail",
+          "label": "Track Record Claim {key}: Verifiable Detail",
+          "kind": "text"
+        },
+        {
+          "path": "sponsor.cash_equity_to_date",
+          "label": "Cash Equity to Date",
+          "kind": "money"
+        },
+        {
+          "path": "sponsor.liquidity_cushion",
+          "label": "Liquidity Cushion",
+          "kind": "money"
+        },
+        {
+          "path": "sop[*].accountant_prepared",
+          "label": "SOP {key}: Accountant Prepared",
+          "kind": "boolean"
+        },
+        {
+          "path": "sop[*].assets[*].value",
+          "label": "SOP {key}: Asset Value",
+          "kind": "money"
+        },
+        {
+          "path": "sop[*].assets[*].encumbered_to",
+          "label": "SOP {key}: Asset Encumbered To",
+          "kind": "text"
+        },
+        {
+          "path": "sop[*].liabilities[*].amount",
+          "label": "SOP {key}: Liability",
+          "kind": "money"
+        },
+        {
+          "path": "sop[*].liabilities[*].lender",
+          "label": "SOP {key}: Liability Lender",
+          "kind": "text"
+        },
+        {
+          "path": "sop[*].free_cash",
+          "label": "SOP {key}: Free Cash",
+          "kind": "money"
+        },
+        {
+          "path": "sop[*].net_position",
+          "label": "SOP {key}: Net Position",
+          "kind": "money",
+          "core": true,
+          "collection_label": "Statements of Position"
+        },
+        {
+          "path": "ato.outstanding_debts[*]",
+          "label": "ATO Outstanding Debt: {key}",
+          "kind": "text"
+        },
+        {
+          "path": "ato.payment_arrangements[*]",
+          "label": "ATO Payment Arrangement: {key}",
+          "kind": "text"
+        },
+        {
+          "path": "ato.disputes[*]",
+          "label": "ATO Dispute: {key}",
+          "kind": "text"
+        },
+        {
+          "path": "ato.position_clear",
+          "label": "ATO Position Clear",
+          "kind": "boolean",
+          "core": true
+        }
+      ]
+    },
+    {
+      "key": "screening",
+      "title": "Screening",
+      "applies_to": [
+        "all"
+      ],
+      "fields": [
+        {
+          "path": "screening.credit.adverse_findings[*]",
+          "label": "Adverse Credit Finding: {key}",
+          "kind": "text"
+        },
+        {
+          "path": "screening.aml.provider",
+          "label": "AML Screening Provider",
+          "kind": "text"
+        },
+        {
+          "path": "screening.aml.sanctions",
+          "label": "Sanctions Match",
+          "kind": "boolean",
+          "core": true
+        },
+        {
+          "path": "screening.aml.pep",
+          "label": "PEP Match",
+          "kind": "boolean",
+          "core": true
+        },
+        {
+          "path": "screening.aml.adverse_media",
+          "label": "Adverse Media",
+          "kind": "boolean",
+          "core": true
+        },
+        {
+          "path": "screening.identity.verified",
+          "label": "Identity Verified",
+          "kind": "boolean"
+        }
+      ]
+    },
+    {
+      "key": "insurance",
+      "title": "Insurance and Rates",
+      "applies_to": [
+        "all"
+      ],
+      "fields": [
+        {
+          "path": "insurance[*].cover_type",
+          "label": "{key} Insurance: Cover Type",
+          "kind": "text",
+          "core": true,
+          "collection_label": "Insurance Certificates"
+        },
+        {
+          "path": "insurance[*].sum",
+          "label": "{key} Insurance: Sum Insured",
+          "kind": "money",
+          "core": true,
+          "collection_label": "Insurance Certificates"
+        },
+        {
+          "path": "insurance[*].parties_noted[*]",
+          "label": "{key} Insurance: Party Noted",
+          "kind": "text"
+        },
+        {
+          "path": "insurance[*].period_start",
+          "label": "{key} Insurance: Period Start",
+          "kind": "date"
+        },
+        {
+          "path": "insurance[*].period_end",
+          "label": "{key} Insurance: Period End",
+          "kind": "date",
+          "core": true,
+          "collection_label": "Insurance Certificates"
+        },
+        {
+          "path": "rates[land_tax].cleared",
+          "label": "Land Tax Cleared",
+          "kind": "boolean",
+          "core": true
+        },
+        {
+          "path": "rates[water].cleared",
+          "label": "Water Rates Cleared",
+          "kind": "boolean",
+          "core": true
+        },
+        {
+          "path": "rates[council].cleared",
+          "label": "Council Rates Cleared",
+          "kind": "boolean",
+          "core": true
+        },
+        {
+          "path": "rates[*].cleared",
+          "label": "{key} Rates Cleared",
+          "kind": "boolean"
+        },
+        {
+          "path": "rates[*].issue_date",
+          "label": "{key} Rates: Issue Date",
+          "kind": "date"
+        },
+        {
+          "path": "rates[*].property",
+          "label": "{key} Rates: Property",
+          "kind": "text"
+        },
+        {
+          "path": "rates[*].entity",
+          "label": "{key} Rates: Entity",
+          "kind": "text"
+        },
+        {
+          "path": "payout.amount",
+          "label": "Payout Amount",
+          "kind": "money",
+          "core": true
+        },
+        {
+          "path": "payout.mortgagee",
+          "label": "Outgoing Mortgagee",
+          "kind": "text"
+        },
+        {
+          "path": "payout.method",
+          "label": "Settlement Method",
+          "kind": "text"
+        }
+      ]
+    },
+    {
+      "key": "construction",
+      "title": "Construction",
+      "applies_to": [
+        "construction",
+        "bridge"
+      ],
+      "fields": [
+        {
+          "path": "builder.licence.number",
+          "label": "Builder Licence Number",
+          "kind": "text",
+          "core": true
+        },
+        {
+          "path": "builder.licence.current",
+          "label": "Builder Licence Current",
+          "kind": "boolean",
+          "core": true
+        },
+        {
+          "path": "builder.licence.category",
+          "label": "Builder Licence Category",
+          "kind": "text"
+        },
+        {
+          "path": "builder.financials.cash_position",
+          "label": "Builder Cash Position",
+          "kind": "money",
+          "core": true
+        },
+        {
+          "path": "builder.financials.defaults[*]",
+          "label": "Builder Default: {key}",
+          "kind": "text"
+        },
+        {
+          "path": "builder.references[*]",
+          "label": "Builder Reference: {key}",
+          "kind": "text",
+          "core": true,
+          "collection_label": "Builder References"
+        },
+        {
+          "path": "builder.site_manager",
+          "label": "Site Manager",
+          "kind": "text"
+        },
+        {
+          "path": "qs.firm",
+          "label": "QS Firm",
+          "kind": "text"
+        },
+        {
+          "path": "qs.project_cost",
+          "label": "QS Project Cost",
+          "kind": "money",
+          "core": true
+        },
+        {
+          "path": "qs.cost_to_complete",
+          "label": "QS Cost to Complete",
+          "kind": "money",
+          "core": true
+        },
+        {
+          "path": "qs.contract_sum_view",
+          "label": "QS View of Contract Sum",
+          "kind": "text"
+        },
+        {
+          "path": "qs.cost_lines[*].amount",
+          "label": "QS Cost Line {key}: Amount",
+          "kind": "money"
+        },
+        {
+          "path": "qs.cost_lines[*].label",
+          "label": "QS Cost Line {key}: Label",
+          "kind": "text"
+        },
+        {
+          "path": "qs.cost_lines[*].basis",
+          "label": "QS Cost Line {key}: Basis",
+          "kind": "text"
+        },
+        {
+          "path": "qs.overrun_risks[*]",
+          "label": "QS Overrun Risk: {key}",
+          "kind": "text"
+        },
+        {
+          "path": "qs.items_not_in_feasibility[*]",
+          "label": "Item Not in Feasibility: {key}",
+          "kind": "text"
+        },
+        {
+          "path": "qs.divergence_vs_developer[*].qs_figure",
+          "label": "QS Divergence {key}: QS Figure",
+          "kind": "money"
+        },
+        {
+          "path": "qs.divergence_vs_developer[*].developer_figure",
+          "label": "QS Divergence {key}: Developer Figure",
+          "kind": "money"
+        },
+        {
+          "path": "qs.agreement_appropriate",
+          "label": "Construction Agreement Appropriate",
+          "kind": "boolean"
+        },
+        {
+          "path": "building_contract.contract_type",
+          "label": "Building Contract Type",
+          "kind": "text",
+          "core": true
+        },
+        {
+          "path": "building_contract.contract_sum",
+          "label": "Building Contract Sum",
+          "kind": "money",
+          "core": true
+        },
+        {
+          "path": "building_contract.retention.amount",
+          "label": "Retention Amount",
+          "kind": "money"
+        },
+        {
+          "path": "building_contract.retention.timing",
+          "label": "Retention Timing",
+          "kind": "text"
+        },
+        {
+          "path": "building_contract.defects_liability_period",
+          "label": "Defects Liability Period",
+          "kind": "text"
+        },
+        {
+          "path": "building_contract.programme",
+          "label": "Construction Programme",
+          "kind": "text"
+        },
+        {
+          "path": "building_contract.key_clauses[*]",
+          "label": "Building Contract Clause: {key}",
+          "kind": "text"
+        },
+        {
+          "path": "building_contract.tripartite_present",
+          "label": "Tripartite Referenced in Contract",
+          "kind": "boolean"
+        },
+        {
+          "path": "building_contract.step_in_rights",
+          "label": "Step-In Rights under Contract",
+          "kind": "text"
+        },
+        {
+          "path": "equity_evidence.invoices[*].supplier",
+          "label": "Equity Invoice {key}: Supplier",
+          "kind": "text"
+        },
+        {
+          "path": "equity_evidence.invoices[*].amount",
+          "label": "Equity Invoice {key}: Amount",
+          "kind": "money"
+        },
+        {
+          "path": "equity_evidence.invoices[*].date",
+          "label": "Equity Invoice {key}: Date",
+          "kind": "date"
+        },
+        {
+          "path": "equity_evidence.invoices[*].description",
+          "label": "Equity Invoice {key}: Description",
+          "kind": "text"
+        },
+        {
+          "path": "equity_evidence.total",
+          "label": "Equity Evidenced",
+          "kind": "money",
+          "core": true
+        },
+        {
+          "path": "presales[*].purchaser",
+          "label": "Presale {key}: Purchaser",
+          "kind": "text"
+        },
+        {
+          "path": "presales[*].price",
+          "label": "Presale {key}: Price",
+          "kind": "money",
+          "core": true,
+          "collection_label": "Presales"
+        },
+        {
+          "path": "presales[*].deposit.amount",
+          "label": "Presale {key}: Deposit",
+          "kind": "money"
+        },
+        {
+          "path": "presales[*].deposit.paid",
+          "label": "Presale {key}: Deposit Paid",
+          "kind": "boolean"
+        },
+        {
+          "path": "presales[*].deposit.holder",
+          "label": "Presale {key}: Deposit Holder",
+          "kind": "text"
+        },
+        {
+          "path": "presales[*].deposit.form",
+          "label": "Presale {key}: Deposit Form",
+          "kind": "text"
+        },
+        {
+          "path": "presales[*].arms_length",
+          "label": "Presale {key}: Arm's Length",
+          "kind": "boolean"
+        },
+        {
+          "path": "presales[*].exchanged",
+          "label": "Presale {key}: Exchanged",
+          "kind": "boolean",
+          "core": true,
+          "collection_label": "Presales"
+        },
+        {
+          "path": "presales[*].unconditional",
+          "label": "Presale {key}: Unconditional",
+          "kind": "boolean"
+        },
+        {
+          "path": "presales[*].related_party_disclosed",
+          "label": "Presale {key}: Related Party Disclosed",
+          "kind": "boolean"
+        },
+        {
+          "path": "presales[*].sunset_date",
+          "label": "Presale {key}: Sunset Date",
+          "kind": "date"
+        },
+        {
+          "path": "consultants[*].findings[*]",
+          "label": "Consultant Report {key}: Finding",
+          "kind": "text"
+        },
+        {
+          "path": "tripartite.step_in_rights",
+          "label": "Tripartite Step-In Rights",
+          "kind": "boolean"
+        },
+        {
+          "path": "tripartite.funding_protection_on_builder_failure",
+          "label": "Funding Protection on Builder Failure",
+          "kind": "text"
+        },
+        {
+          "path": "tripartite.status",
+          "label": "Tripartite Deed Status",
+          "kind": "text",
+          "core": true
+        }
+      ]
+    },
+    {
+      "key": "planning",
+      "title": "Planning",
+      "applies_to": [
+        "construction",
+        "bridge"
+      ],
+      "fields": [
+        {
+          "path": "da.instrument_type",
+          "label": "Approval Instrument",
+          "kind": "text"
+        },
+        {
+          "path": "da.reference",
+          "label": "Approval Reference",
+          "kind": "text",
+          "core": true
+        },
+        {
+          "path": "da.authority",
+          "label": "Consent Authority",
+          "kind": "text"
+        },
+        {
+          "path": "da.approved_date",
+          "label": "Approval Date",
+          "kind": "date",
+          "core": true
+        },
+        {
+          "path": "da.approved_description",
+          "label": "Approved Development",
+          "kind": "text"
+        },
+        {
+          "path": "da.approved_use",
+          "label": "Approved Use",
+          "kind": "text"
+        },
+        {
+          "path": "da.build_ready",
+          "label": "Build Ready",
+          "kind": "boolean",
+          "core": true
+        },
+        {
+          "path": "da.build_ready_basis",
+          "label": "Build Ready Basis",
+          "kind": "text"
+        },
+        {
+          "path": "da.lapse_date",
+          "label": "Approval Lapse Date",
+          "kind": "date"
+        },
+        {
+          "path": "da.lapse_basis",
+          "label": "Approval Lapse Basis",
+          "kind": "text"
+        },
+        {
+          "path": "da.approval_current",
+          "label": "Approval Current",
+          "kind": "boolean",
+          "core": true
+        },
+        {
+          "path": "da.conditions[*].text",
+          "label": "Approval Condition {key}",
+          "kind": "text"
+        },
+        {
+          "path": "da.conditions[*].status",
+          "label": "Approval Condition {key}: Status",
+          "kind": "text"
+        },
+        {
+          "path": "da.conditions[*].blocker",
+          "label": "Approval Condition {key}: Blocker",
+          "kind": "boolean"
+        },
+        {
+          "path": "da.contributions[*].description",
+          "label": "Contribution {key}: Description",
+          "kind": "text"
+        },
+        {
+          "path": "da.contributions[*].amount",
+          "label": "Contribution {key}: Amount",
+          "kind": "money"
+        },
+        {
+          "path": "da.contributions[*].trigger",
+          "label": "Contribution {key}: When Payable",
+          "kind": "text"
+        },
+        {
+          "path": "da.contributions[*].amount_on_separate_notice",
+          "label": "Contribution {key}: Amount on Separate Notice",
+          "kind": "boolean"
+        },
+        {
+          "path": "da.build_authorisation.kind",
+          "label": "Build Authorisation",
+          "kind": "text"
+        },
+        {
+          "path": "da.build_authorisation.reference",
+          "label": "Build Authorisation Reference",
+          "kind": "text"
+        },
+        {
+          "path": "da.build_authorisation.status",
+          "label": "Build Authorisation Status",
+          "kind": "text"
+        },
+        {
+          "path": "da.occupation_authorisation.kind",
+          "label": "Occupation Authorisation",
+          "kind": "text"
+        },
+        {
+          "path": "da.occupation_authorisation.reference",
+          "label": "Occupation Authorisation Reference",
+          "kind": "text"
+        },
+        {
+          "path": "da.occupation_authorisation.status",
+          "label": "Occupation Authorisation Status",
+          "kind": "text"
+        },
+        {
+          "path": "da.plans_match_feasibility",
+          "label": "Plans Match Feasibility",
+          "kind": "boolean"
+        },
+        {
+          "path": "da_lodgement.lodged",
+          "label": "DA Lodged",
+          "kind": "boolean"
+        },
+        {
+          "path": "da_lodgement.lodgement_date",
+          "label": "DA Lodgement Date",
+          "kind": "date"
+        },
+        {
+          "path": "da_lodgement.reference",
+          "label": "DA Lodgement Reference",
+          "kind": "text"
+        }
+      ]
+    },
+    {
+      "key": "purchase",
+      "title": "Purchase and Leases",
+      "applies_to": [
+        "bridge"
+      ],
+      "fields": [
+        {
+          "path": "purchase_contract.vendor",
+          "label": "Vendor",
+          "kind": "text",
+          "core": true
+        },
+        {
+          "path": "purchase_contract.price",
+          "label": "Purchase Price",
+          "kind": "money",
+          "core": true
+        },
+        {
+          "path": "purchase_contract.settlement_date",
+          "label": "Settlement Date",
+          "kind": "date",
+          "core": true
+        },
+        {
+          "path": "purchase_contract.conditions[*]",
+          "label": "Purchase Condition: {key}",
+          "kind": "text"
+        },
+        {
+          "path": "leases[*].tenant",
+          "label": "Lease {key}: Tenant",
+          "kind": "text",
+          "core": true,
+          "collection_label": "Leases"
+        },
+        {
+          "path": "leases[*].rent",
+          "label": "Lease {key}: Rent",
+          "kind": "money",
+          "core": true,
+          "collection_label": "Leases"
+        },
+        {
+          "path": "leases[*].term",
+          "label": "Lease {key}: Term",
+          "kind": "text"
+        },
+        {
+          "path": "leases[*].expiry",
+          "label": "Lease {key}: Expiry",
+          "kind": "date"
+        }
+      ]
+    },
+    {
+      "key": "stock",
+      "title": "Stock and Sales",
+      "applies_to": [
+        "residual_stock"
+      ],
+      "fields": [
+        {
+          "path": "oc_titles[*].lot",
+          "label": "Lot {key}",
+          "kind": "text"
+        },
+        {
+          "path": "oc_titles[*].title_reference",
+          "label": "Lot {key}: Title Reference",
+          "kind": "text"
+        },
+        {
+          "path": "oc_titles[*].registered",
+          "label": "Lot {key}: Title Registered",
+          "kind": "boolean",
+          "core": true,
+          "collection_label": "Titles"
+        },
+        {
+          "path": "price_list.approved",
+          "label": "Price List Approved",
+          "kind": "boolean",
+          "core": true
+        },
+        {
+          "path": "price_list.lots[*]",
+          "label": "Approved Price: Lot {key}",
+          "kind": "money"
+        },
+        {
+          "path": "contracts_eois[*].kind",
+          "label": "Contract or EOI {key}: Kind",
+          "kind": "text"
+        },
+        {
+          "path": "contracts_eois[*].purchaser",
+          "label": "Contract or EOI {key}: Purchaser",
+          "kind": "text"
+        },
+        {
+          "path": "contracts_eois[*].price",
+          "label": "Contract or EOI {key}: Price",
+          "kind": "money",
+          "core": true,
+          "collection_label": "Exchanged Contracts and EOIs"
+        },
+        {
+          "path": "contracts_eois[*].status",
+          "label": "Contract or EOI {key}: Status",
+          "kind": "text"
+        },
+        {
+          "path": "deposits_trust.held_in_trust",
+          "label": "Deposits Held in Trust Confirmed",
+          "kind": "boolean"
+        },
+        {
+          "path": "deposits_trust.undertaking_present",
+          "label": "Trust Undertaking Present",
+          "kind": "boolean",
+          "core": true
+        },
+        {
+          "path": "deposits_trust.total",
+          "label": "Deposits Held in Trust",
+          "kind": "money",
+          "core": true
+        }
+      ]
+    }
+  ]
+}

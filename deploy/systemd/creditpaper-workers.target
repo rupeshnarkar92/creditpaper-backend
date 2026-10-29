@@ -1,0 +1,7 @@
+[Unit]
+Description=Creditpaper fast-ingestion, OCR and generation workers
+Wants=creditpaper-worker@fast.service creditpaper-worker@ocr.service creditpaper-worker@generation.service
+After=network-online.target
+
+[Install]
+WantedBy=multi-user.target

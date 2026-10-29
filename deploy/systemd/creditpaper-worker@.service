@@ -1,0 +1,27 @@
+[Unit]
+Description=Creditpaper processing worker (%i lane)
+After=network-online.target
+Wants=network-online.target
+PartOf=creditpaper-workers.target
+
+[Service]
+Type=simple
+User=creditpaper
+Group=creditpaper
+WorkingDirectory=/opt/creditpaper
+EnvironmentFile=/etc/creditpaper/worker.env
+Environment=CREDITPAPER_PROCESS_ROLE=worker
+ExecStart=/opt/creditpaper/.venv/bin/python scripts/process_jobs.py --all-tenants --lane %i --idle-sleep 2
+Restart=always
+RestartSec=3
+TimeoutStopSec=120
+KillSignal=SIGTERM
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/creditpaper /var/log/creditpaper
+UMask=0077
+
+[Install]
+WantedBy=creditpaper-workers.target

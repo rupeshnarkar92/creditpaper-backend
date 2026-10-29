@@ -1,0 +1,227 @@
+# Environments / secrets
+.env
+.env.*
+!.env.example
+!.env.local.example
+.venv/
+venv/
+
+# Tenant data — never committed (D7/D12). Real deal files, signed papers, prior papers.
+fixtures/**
+!fixtures/README.md
+ground_truth/
+
+# Python
+__pycache__/
+*.pyc
+*.egg-info/
+dist/
+build/
+.pytest_cache/
+.ruff_cache/
+
+# Local test-run artifacts (junit XML from --junit-xml runs) — not fixtures,
+# never intentionally committed.
+test_results.xml
+*.junit.xml
+
+# Outputs
+output/
+*.docx
+!docs/**/*.docx
+
+# OS / editors
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Brainstorming visual-companion scratch (superpowers skill)
+.superpowers/
+.worktrees/
+
+# Legal instruments (NDAs, agreements, the D12 boundary paper). Kept local:
+# these are executed/draft legal documents, not source, and they must never be
+# published to the remote by an accidental `git add -A`.
+credit paper legals/
+
+# Scratch debug output from doc-consistency checks — not an artefact of the build.
+check_out.txt
+
+# Agent tooling. Project-level .claude/settings.json IS shared and committed;
+# per-developer overrides are not. Previously this was only covered by one
+# machine's global gitignore, so a new clone would have committed it.
+.claude/settings.local.json
+
+# Type-checker cache
+.mypy_cache/
+
+# Node (apps/credit-web has its own .gitignore; this is the belt-and-braces
+# rule so a stray install at the repo root can't be committed)
+node_modules/
+
+*.log
+*.err
+*.out
+backend.log
+vite*.out
+server.err
+*.yml
+
+/playwright-mcp/
+.playwright-mcp/
+graphify-out/
+*.zip
+env_credit.txt
+src/var/
+*.pdf
+scripts/ui_screenshots/
+
+# Document storage is tenant data; never tracked.
+var/
+apps/credit-web/*test-paper-edits.mjs
+
+tests*
+test*
+PROJECT_PLAN_v2.xlsx
+*.xlsx
+docs/plan
+docs/plans/
+tests/
+docs/PROJECT_STATE.xlsx
+text-requirement.PNG
+docs/PROJECT_PLAN_STATE.md
+
+scripts/cp-project-tracker.csv
+
+# Keep focused regression tests trackable despite the broad local-test ignores above.
+!tests/
+tests/*
+!tests/test_authenticated_application_context.py
+!tests/test_llm_byok.py
+!tests/test_integrations_policy_validation.py
+!tests/test_integrations_gateway.py
+
+# Selectively expose ingestion regression suites; keep unrelated local tests ignored.
+!tests/ingest/
+!tests/ingest/**
+!tests/llm/
+tests/llm/*
+!tests/llm/conftest.py
+!tests/llm/test_client_provider_override.py
+!tests/llm/test_registry.py
+!tests/model/
+tests/model/*
+!tests/model/__init__.py
+!tests/model/test_concepts.py
+!tests/model/test_fact_basis.py
+!tests/ledger/
+tests/ledger/*
+!tests/ledger/test_contradictions.py
+!tests/ledger/test_labels.py
+!tests/processing/
+tests/processing/*
+!tests/processing/test_page_selector.py
+!tests/test_anchor_rule_matches_the_verifier.py
+!tests/test_extractor_confidence.py
+!tests/test_page_selector.py
+!tests/test_prompt_anchor_contract.py
+!tests/test_rubric_wiring.py
+!tests/test_schema_drift.py
+*.pyc
+tests/ingest/
+tests/
+docs/
+uv.lock
+src/creditpaper/prompts/support/support.v1.txt
+tests/ledger/test_worker_all_tenants.py
+
+# Keep this focused regression test trackable despite the local test-suite ignores above.
+!tests/
+tests/*
+!tests/deals/
+tests/deals/*
+!tests/deals/test_archive_intake.py
+!tests/deals/test_ingestion_gate.py
+!tests/deals/test_slot_board_read.py
+!tests/deals/test_document_storage_path.py
+tests/
+!tests/
+!tests/ledger/
+tests/ledger/*
+!tests/ledger/test_approval_disclosures.py
+tests/ledger
+
+# Keep the local job retry/dead-letter regression visible through this broad test ignore.
+!tests/test_job_retry_policy.py
+
+# Keep regression coverage for the Scale & Resilience safeguards above the local-test ignore.
+!tests/test_scale_resilience_safeguards.py
+tests/deals/test_documents.py
+tests/test_scale_resilience_safeguards.py
+tests/deals/test_documents.py
+tests/deals/test_documents.py
+
+# Keep the enterprise security regression visible through the broad test ignore.
+!tests/test_password_oracle_closed.py
+!tests/test_rate_limit.py
+!tests/test_tenant_rls_coverage.py
+!tests/test_no_new_inline_sql.py
+
+# Security tracker regressions (SEC-08/09/12/13/14)
+!tests/test_security_tracker.py
+!tests/test_encryption_middleware.py
+brag-output/
+hyperframes.lock.json
+.archify/
+scripts/uat_cols.py
+scripts/uat_deal_flow_test.py
+.gitignore
+.gitignore
+scripts/uat_*.py
+
+tests/conftest.py
+scripts/uat_detached_run.ps1
+apps/credit-web/scripts/smoke-deal-workflow.cjs
+apps/credit-web/package.json
+tests/test_encryption_middleware.py
+tests/conftest.py
+tests/test_no_new_inline_sql.py
+tests/test_tenant_rls_coverage.py
+tests/test_tenant_rls_coverage.py
+tests/test_tenant_rls_coverage.py
+tests/test_no_new_inline_sql.py
+tests/test_no_new_inline_sql.py
+!tests/test_worker_dispatch_mode.py
+!tests/test_slot_batch_roundtrip.py
+!tests/test_slot_match_inputs.py
+!tests/test_bundle_check_cache.py
+!tests/test_slot_confirmation_command.py
+!tests/test_slot_confirmation_db.py
+!tests/test_processing_routines.py
+!scripts/test_benchmark_slot_matching.py
+!scripts/test_worker_scheduling.py
+!scripts/test_processing_finalize.py
+!scripts/test_processing_job_batching.py
+!scripts/test_progressive_ingestion_gate.py
+!docs/
+docs/*
+!docs/ingestion-hardening-status.md
+!docs/operations/
+!docs/operations/ingestion-workers.md
+tests/deals/test_slot_board.py
+
+# Ignore the root test directory (already tracked files remain tracked).
+/tests/
+
+# Queue architecture regression tests are product tests, not local upload data.
+!/tests/
+/tests/*
+!/tests/queueing/
+/tests/queueing/*
+!/tests/queueing/test_queue_config.py
+!/tests/queueing/test_tenant_limits.py
+!/tests/queueing/test_multitenant_fairness.py
+!/tests/queueing/test_dispatch.py
+!docs/LOCAL_QUEUE.md
+!docker-compose.queue.yml

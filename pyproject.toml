@@ -1,0 +1,221 @@
+[project]
+name = "creditpaper"
+version = "0.1.0"
+description = "Credit paper generation pipeline for Australian CRE private credit (working name)"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "Proprietary" }
+authors = [{ name = "Hyperion Tech" }]
+classifiers = [
+    "Private :: Do Not Upload",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+]
+
+# Upper bounds are deliberate. `anthropic` is pre-1.0 and ships breaking changes in
+# minor releases; it is consumed at exactly one place (obs/cost.py, the LLM choke
+# point), so an unpinned upgrade lands there silently. uv.lock holds the exact
+# resolved set — these bounds are the guard for anyone installing without it.
+dependencies = [
+    "fastapi>=0.110,<1.0",
+    "uvicorn[standard]>=0.29,<1.0",
+    "pydantic>=2.7,<3.0",
+    # 1.2.0, not 1.1: harness/review.py reads `doc.comments`, which does not
+    # exist before 1.2.0. The declared floor was a guess that resolved to a
+    # version the code cannot run on — the install succeeds and the failure
+    # arrives later, at the point an analyst's comments are read back.
+    "python-docx>=1.2,<2.0",
+    "openpyxl>=3.1,<4.0",
+    "httpx>=0.27,<1.0",
+    # 0.125, not 0.40: llm/client.py passes `inference_geo` and `output_config`,
+    # neither of which 0.40 accepts. This floor is the version the lockfile
+    # carries and the suite is verified against, rather than the oldest release
+    # that might work — an unverified floor is the defect being fixed here, and
+    # replacing one guess with another would not fix it.
+    "anthropic>=0.125,<1.0",
+    "python-dotenv>=1.0,<2.0",
+    # Direct, not incidental: api/prose_blocks.py imports TypedDict from here
+    # because pydantic rejects typing.TypedDict below 3.12. It arrives anyway as a
+    # pydantic dependency, but a module that imports it must declare it.
+    "typing-extensions>=4.10,<5.0",
+    # Fuzzy anchor matching uses the aligned matched span, not only a score.
+    "rapidfuzz>=3.9,<4.0",
+    "pypdfium2>=5.13,<6.0",
+    "psycopg[binary,pool]>=3.3.4",
+    "pillow>=10.0",
+    # Tesseract Python bindings; the OCR happens in the `tesseract` binary which
+    # must be on PATH. Missing binary raises pytesseract.TesseractNotFoundError
+    # and the pipeline records processing_error='ocr_unavailable'.
+    "pytesseract>=0.3.10",
+    # The second, independent local OCR engine (processing/ocr_rapid.py): PP-OCR
+    # models (bundled in the wheel) on onnxruntime. Pure pip, no system binary.
+    "rapidocr>=3.10,<4.0",
+    "onnxruntime>=1.20,<2.0",
+    # Auth dependencies
+    "sqlalchemy[asyncio]>=2.0.35",
+    "asyncpg>=0.30.0",
+    "alembic>=1.13.2",
+    "pydantic-settings>=2.7.0",
+    "pydantic[email]>=2.10.0",
+    "PyJWT[crypto]>=2.10.1,<3.0",
+    "argon2-cffi>=23.1.0",
+    "authlib>=1.3.1",
+    "slowapi>=0.1.9",
+    "python-multipart>=0.0.9",
+    "cryptography>=43.0.0",
+    "pdfplumber>=0.11",
+    # Redis is an ephemeral delivery and concurrency-coordination layer only;
+    # processing_jobs in PostgreSQL remains the durable workflow record.
+    "celery[redis]>=5.5,<6.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    # 9.1.1, not 8.0: everything below 9.0.3 carries GHSA tmpdir handling, so a
+    # floor of 8.0 declares a range whose lower half is a known vulnerability —
+    # `uv sync --locked` would never resolve it, but `pip install -e ".[dev]"`
+    # off pyproject alone would. Dependabot *widens* a bound on a major bump
+    # (it wrote `>=8.0,<10.0`) rather than moving the floor; tighten it by hand
+    # after merging one, the same rule as `anthropic` above — the floor is the
+    # version the lockfile carries and the suite is verified against.
+    "pytest>=9.1.1,<10.0",
+    "ruff>=0.4,<1.0",
+    # 2.3.1, not 1.10: Dependabot widens a bound on a major bump instead of
+    # moving the floor, so `>=1.10,<3.0` claimed support for a mypy CI never
+    # runs and whose error set differs from the one the allowlist below is
+    # tuned against. Same rule as `pytest` and `anthropic` — the floor is the
+    # version the lockfile carries and the config is verified against.
+    "mypy>=2.3.1,<3.0",
+    # Builds the synthetic PDFs tests read (tests/pdf_builder.py); BSD. PyMuPDF,
+    # which built them before, is AGPL and was removed (DECISIONS 2026-10-07).
+    "reportlab>=4.2",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/creditpaper"]
+# PEP 561 marker. Without it a consumer's mypy treats every import from this
+# package as Any, so the pydantic types the platform team builds against provide
+# no checking at all downstream — the seam would be typed on our side and
+# untyped on theirs.
+artifacts = ["src/creditpaper/py.typed"]
+
+[tool.ruff]
+line-length = 110
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+# UP042 (`class X(str, Enum)` -> `enum.StrEnum`) became reachable when the Python
+# floor rose to 3.11. It is NOT a safe automatic fix here: the two differ in what
+# `str(member)` returns — `StrEnum` yields the value, `(str, Enum)` yields
+# `Class.MEMBER` — and enum values are rendered into credit papers and compared
+# against extracted strings, with `getattr(x, "value", x)` fallbacks in several
+# places precisely because the enum/bare-string boundary is already inconsistent
+# (see the derive/materiality divergence in the 2026-08-21 audit). Migrating all
+# 11 sites is a behaviour change that needs its own reviewed pass, not a drive-by
+# in a version bump.
+#
+# S1-19 resolved 2026-08-21: the migration is DEFERRED, not pending. Measured on
+# both 3.11 and 3.14, `str(member)` gives `Class.MEMBER` under `(str, Enum)` and
+# the value under `StrEnum` — a real behaviour change in a system that renders
+# enum values into credit papers, for no correctness gain. The defect the audit
+# actually found was the enum/bare-string divergence, and that is fixed at the
+# write path (`apply` normalises) with one tolerant reader (`deal_type_str`).
+# tests/test_enum_rendering.py pins the rendered form of every enum value, so
+# whoever does migrate can see immediately whether anything a reader sees moved.
+ignore = ["UP042"]
+
+[tool.ruff.lint.per-file-ignores]
+# Applied migrations are append-only history that carries long SQL as single
+# string literals; re-wrapping them rewrites reviewed history for no gain.
+"src/creditpaper/alembic/versions/*" = ["E501"]
+# One-off operational/debug scripts, not shipped library code.
+"scripts/*" = ["E501"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+# Makes `tests/factories.py` importable from every test module. Ten modules each
+# defined their own near-identical fact factory, quietly disagreeing about the
+# default extraction method.
+pythonpath = ["tests"]
+# --strict-markers: an unregistered marker is a typo, and pytest's default is to
+#   ignore it silently — so `@pytest.mark.slwo` deselects nothing and the test it
+#   was meant to tag runs (or doesn't) with no signal either way.
+# --strict-config: a typo in THIS block is likewise ignored by default, which
+#   would quietly disable everything below.
+addopts = "-q --strict-markers --strict-config"
+filterwarnings = [
+    # Default to failing. A warning nobody has to act on is a warning nobody
+    # reads, and this suite already emitted one on every run that nobody had
+    # looked at.
+    "error",
+    # Known and not ours: fastapi's TestClient imports httpx through starlette,
+    # which now warns. Ignored by exact message so a DIFFERENT starlette
+    # deprecation still fails rather than hiding behind a broad category filter.
+    "ignore:Using `httpx` with `starlette.testclient` is deprecated.*",
+    # Pre-existing auth schema uses class-based Config (deprecated in Pydantic V2).
+    "ignore:Support for class-based `config` is deprecated.*",
+    # Alembic's env module uses 'path_separator' which raises a deprecation.
+    "ignore:path_separator.*:DeprecationWarning",
+]
+
+# Type checking is scoped and grows by allowlist, not global. A half-configured
+# global setting is noise nobody acts on; a small strictly-clean core that CI
+# enforces is worth more. These four modules enforce the D4 invariants (`Fact`
+# construction, the citation grammar, flattening) and are strict-clean today.
+#
+# Still to be brought up, with strict error counts as of mypy 2.3.1. Re-measure
+# these on a mypy major — they moved on the 1.20 -> 2.3.1 bump, and a work-list
+# that silently drifts is worth less than no work-list:
+#   model/derive.py      39  — annotation gaps, NOT crash paths. An audit traced
+#                              every one to a single root cause: `_present`
+#                              returns `bool` rather than a type guard, so mypy
+#                              cannot see the narrowing it performs. An earlier
+#                              note here claimed these were real None-guard
+#                              crashes; that was wrong, and the defects that
+#                              were real in that file are fixed (2026-08-21).
+#   model/apply.py        5  — unparameterised `Fact` generics
+#   model/materiality.py  3
+#   model/deal.py         2
+# `model/signal.py` came clean on the 2.3.1 bump and moved into the list below.
+[tool.mypy]
+python_version = "3.11"
+files = [
+    # The contract package is checked strictly in full: it is what the platform
+    # team's own mypy resolves against, so an `Any` leaking out of here defeats
+    # py.typed and the whole point of a typed seam.
+    "src/creditpaper/contracts",
+    "src/creditpaper/markup.py",
+    "src/creditpaper/paths.py",
+    "src/creditpaper/config.py",
+    "src/creditpaper/format.py",
+    "src/creditpaper/model/__init__.py",
+    "src/creditpaper/model/core.py",
+    "src/creditpaper/model/citations.py",
+    "src/creditpaper/model/flatten.py",
+    "src/creditpaper/model/signal.py",
+    # The generation harness: new code, typed strictly from the start.
+    "src/creditpaper/generation",
+    "src/creditpaper/llm/structured.py",
+    "src/creditpaper/llm/stages.py",
+]
+strict = true
+warn_unused_configs = true
+plugins = ["pydantic.mypy"]
+
+[tool.coverage.run]
+source = ["creditpaper"]
+omit = ["tests/*"]
+
+[tool.coverage.report]
+fail_under = 85
+show_missing = true

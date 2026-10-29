@@ -1,0 +1,41 @@
+# Review routing for the ownership split banked on 2026-08-21: the AI engine is
+# Jason's; backend, API and frontend belong to the incoming development team,
+# behind the contract package.
+#
+# ADVISORY TODAY, NOT ENFORCED. CODEOWNERS only compels a review when branch
+# protection requires one, and this repository is on a plan where branch
+# protection is unavailable (the API returns 403: "Upgrade to GitHub Pro or make
+# this repository public"). Until that changes, this file requests reviewers; it
+# does not gate merges. Do not read a green PR as "an owner approved it".
+
+# Default: anything not matched below.
+*                                   @HyperionTech2026
+
+# ── The engine (Jason) ───────────────────────────────────────────────────────
+/src/creditpaper/model/             @HyperionTech2026
+/src/creditpaper/extractors/        @HyperionTech2026
+/src/creditpaper/agents/            @HyperionTech2026
+/src/creditpaper/harness/           @HyperionTech2026
+/src/creditpaper/renderer/          @HyperionTech2026
+/src/creditpaper/profiles/          @HyperionTech2026
+/src/creditpaper/checks/            @HyperionTech2026
+/src/creditpaper/llm/               @HyperionTech2026
+/src/creditpaper/obs/               @HyperionTech2026
+
+# ── The seam ─────────────────────────────────────────────────────────────────
+# Both sides build against this. A change here is a versioned contract change
+# affecting the platform's generated types — never a drive-by.
+/src/creditpaper/contracts/         @HyperionTech2026
+
+# ── The non-negotiables ──────────────────────────────────────────────────────
+# D1-D12 and the append-only rulings log. A change that conflicts with one of
+# these is escalated, not resolved in a PR.
+/docs/BUILD_PLAN.md                 @HyperionTech2026
+/docs/DECISIONS.md                  @HyperionTech2026
+/docs/DATA_HANDLING.md              @HyperionTech2026
+/CLAUDE.md                          @HyperionTech2026
+
+# ── Gates and supply chain ───────────────────────────────────────────────────
+/.github/                           @HyperionTech2026
+/pyproject.toml                     @HyperionTech2026
+/uv.lock                            @HyperionTech2026

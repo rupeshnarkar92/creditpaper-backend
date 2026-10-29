@@ -1,0 +1,63 @@
+{
+  "_comment": [
+    "Branch protection for main, ready to apply. NOT ACTIVE — this repository is a private repo on a",
+    "plan that returns 403 on both /branches/main/protection and /rulesets ('Upgrade to GitHub Pro or",
+    "make this repository public'). Verified 2026-08-26 against both endpoints, so it is the plan and",
+    "not the mechanism.",
+    "",
+    "Apply the moment the plan allows it:",
+    "  gh api -X POST repos/HyperionTech2026/creditpaper/rulesets --input .github/ruleset-main.json",
+    "",
+    "Then confirm with:",
+    "  gh api repos/HyperionTech2026/creditpaper/rulesets --jq '.[] | \"\\(.name) · \\(.enforcement)\"'",
+    "",
+    "The six required checks are the exact job names emitted by .github/workflows/ci.yml. If a job is",
+    "renamed there, rename it here too — a required check that no longer exists blocks every merge,",
+    "which is the failure mode this file is most likely to cause."
+  ],
+  "name": "main",
+  "target": "branch",
+  "enforcement": "active",
+  "conditions": {
+    "ref_name": {
+      "include": ["~DEFAULT_BRANCH"],
+      "exclude": []
+    }
+  },
+  "rules": [
+    { "type": "deletion" },
+    { "type": "non_fast_forward" },
+    {
+      "type": "pull_request",
+      "parameters": {
+        "required_approving_review_count": 1,
+        "dismiss_stale_reviews_on_push": true,
+        "require_code_owner_review": true,
+        "require_last_push_approval": false,
+        "required_review_thread_resolution": true,
+        "allowed_merge_methods": ["squash", "merge"]
+      }
+    },
+    {
+      "type": "required_status_checks",
+      "parameters": {
+        "strict_required_status_checks_policy": true,
+        "required_status_checks": [
+          { "context": "lint, format, types" },
+          { "context": "tests (py3.11)" },
+          { "context": "tests (py3.13)" },
+          { "context": "generated files are current" },
+          { "context": "web app" },
+          { "context": "secret scan" }
+        ]
+      }
+    }
+  ],
+  "bypass_actors": [
+    {
+      "actor_id": 5,
+      "actor_type": "RepositoryRole",
+      "bypass_mode": "always"
+    }
+  ]
+}
